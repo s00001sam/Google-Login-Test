@@ -10,9 +10,16 @@
         <action
             android:id="@+id/action_homeFragment_to_newFragment"
             app:destination="@id/newFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_fireAuthFragment"
+            app:destination="@id/fireAuthFragment" />
     </fragment>
     <fragment
         android:id="@+id/newFragment"
         android:name="com.sam.googlelogintest.NewFragment"
         android:label="NewFragment" />
+    <fragment
+        android:id="@+id/fireAuthFragment"
+        android:name="com.sam.googlelogintest.FireAuthFragment"
+        android:label="FireAuthFragment" />
 </navigation>

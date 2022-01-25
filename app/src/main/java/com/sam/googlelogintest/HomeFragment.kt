@@ -15,6 +15,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.sam.googlelogintest.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -23,6 +27,7 @@ class HomeFragment : Fragment() {
         private const val TAG = "HomeFragment"
     }
 
+    private lateinit var firebaseAuth: FirebaseAuth
     private var isLogin: Boolean = false
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var binding: FragmentHomeBinding
@@ -31,6 +36,7 @@ class HomeFragment : Fragment() {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             handleSignInResult(task)
             isLogin = true
+            firebaseAuthWithGoogle(task.result)
         }
     }
 
@@ -43,6 +49,7 @@ class HomeFragment : Fragment() {
             .build()
 
         mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
+        firebaseAuth = Firebase.auth
     }
 
     override fun onCreateView(
@@ -67,6 +74,10 @@ class HomeFragment : Fragment() {
 
         binding.btnNew.setOnClickListener {
             findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToNewFragment())
+        }
+
+        binding.btnFire.setOnClickListener {
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToFireAuthFragment())
         }
     }
 
@@ -99,6 +110,20 @@ class HomeFragment : Fragment() {
             binding.tvInfo.text = "${e.statusCode} ${e.localizedMessage}"
             binding.btnLogin.text = "Google Login"
             Log.w(TAG, "signInResult:failed code=" + e.statusCode)
+        }
+    }
+
+    fun firebaseAuthWithGoogle(account : GoogleSignInAccount?){
+        Log.d(TAG, "sam00 firebaseAuthWithGoogle")
+        val credential = GoogleAuthProvider.getCredential(account?.idToken,null)
+        firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
+            if(task.isSuccessful){
+                task.result?.user?.let {
+                    Log.d(TAG, "sam00 uid=${it.uid}")
+                }
+            } else {
+                Log.e(TAG, "sam00 task error=${task.exception?.localizedMessage}")
+            }
         }
     }
 }
